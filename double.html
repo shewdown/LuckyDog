@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LuckyDog | Double</title>
     <link rel="stylesheet" href="style_double.css">
+    <link rel="stylesheet" href="base_style.css">
 </head>
 <body>
     <header>
         <nav>
             <div class="logo">LuckyDog</div>
 
-            <div class="balance">100.00 руб</div>
+            <div class="balance" id="balic">100.00</div>
 
             <div class="profile"></div>
 
@@ -44,7 +45,28 @@
         </div>
         <div class="bet-layout">
             <div class="enter-bet">
-                 <input id="bet-value" type="number" value="0">
+                <button onclick="plusBtnClick()">+</button>
+                <input id="bet-value" type="number" value="0" onfocus="this.select();">
+                <button onclick="minusBtnClick()">-</button>
+            </div>
+            <div class="bnts-bet">
+                <button onclick="semiBtnClick()">1/2</button>
+                <button onclick="allinBtnClick()">ALL IN</button>
+                <button onclick="x2BtnClick()">x2</button>
+            </div>
+            <div class="color-bet">
+                <button>
+                    0.00<br>
+                    2x<br>
+                </button>
+                <button>
+                    0.00<br>
+                    14x<br>
+                </button>
+                <button>
+                    0.00<br>
+                    2x<br>
+                </button>
             </div>
         </div>
     </main>
