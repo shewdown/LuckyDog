@@ -10,7 +10,8 @@
 <body>
     <header>
         <nav>
-            <div class="logo">LuckyDog</div>
+            <div class="logo" onclick="window.location.href='index.html'">LuckyDog</div>
+
 
             <div class="balance" id="balic">100.00</div>
 
@@ -38,10 +39,21 @@
         </div>
 
         <div class="game-layout">
-            <h1 id="timer"></h1>
-            <div class="roulette-container">
-                <div class="pointer"></div>
-                <div class="tape" id="tape"></div>
+            <div class="timer-section">
+                <div class="time" id="timeDisplay">10.00s</div>
+                <div class="label" id="labelDisplay">до начала раунда</div>
+            </div>
+            
+            <div class="wheel-container">
+                <div class="arrow" id="arrow">
+                    <svg viewBox="0 0 24 24" width="28" height="28" fill="#ffce00">
+                        <path d="M12 21l-9-12h18z" />
+                    </svg>
+                </div>
+
+                <div class="wheel-center">
+                    <div class="wheel" id="wheel"></div>
+                </div>
             </div>
         </div>
         <div class="bet-layout">
@@ -75,5 +87,6 @@
     <footer></footer>
 
     <script src="script.js"></script>
+    <script src="wheel-logic.js"></script>
 </body>
 </html>

@@ -1,69 +1,152 @@
 /* game */
 
-.game-layout{
+:root {
+    --wheel-radius: 250px;
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.timer-section {
+    margin-top: 15px;
+    text-align: center;
+    z-index: 10;
+}
+
+.timer-section .time {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    font-variant-numeric: tabular-nums;
+}
+
+.timer-section .label {
+    font-size: 13px;
+    color: #a0a6b5;
+    margin-top: 5px;
+}
+
+.wheel-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
     width: 100%;
-    height: 250px;
-
-    justify-content: center;
-
-    border: 1px solid black;
-    border-radius: 10px;
+    height: 100%;
     background-color: transparent;
-}
-
-.roulette-container {
-    position: relative;
-    margin: 0 10px;
-    width: auto;
-    height: 130px;
-    background: #2a2a2a;
-    border: 4px solid #333;
+    border-top-left-radius: 35px;
+    border-top-right-radius: 35px;
     overflow: hidden;
-    border-radius: 8px;
 }
 
-.pointer{
+.arrow {
+    position: absolute;
+    top: 80px; 
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6));
+}
+
+.arrow.visible {
+    opacity: 1;
+}
+
+.wheel-center {
+    position: absolute;
+    top: -100px; /* Смещение вниз для видимости ровно нижней четверти/трети */
+    left: 50%;
+}
+
+.wheel-bg {
     position: absolute;
     top: 0;
     left: 50%;
-    width: 4px;
-    height: 100%;
-    z-index: 10;
-    background: #ffeb3b;
-    box-shadow: 0 0 10px rgba(255, 235, 59, 0.5);
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background-color: transparent;
+    background-image: 
+        radial-gradient(circle at center, transparent 65%, rgba(0,0,0,0.2) 75%, transparent 100%),
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 100% 100%, 20px 20px, 20px 20px;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05), inset 0 0 50px rgba(0,0,0,0.5);
 }
 
-.tape{
-    display: flex;
+.wheel {
     position: absolute;
-    top: 10px;
+    top: 0;
     left: 0;
+    width: 0;
+    height: 0;
+    z-index: 5;
+    /* Анимация вращения управляется через JS (requestAnimationFrame) */
 }
 
-.card {
-    width: 80px;
-    height: 100px;
-    margin: 0 5px;
+/* Когда колесо "активно" (крутится или показывает результат), приглушаем все ячейки */
+.wheel.is-active .item {
+    opacity: 0.75; /* Уровень тусклости */
+    /* filter: grayscale(0.5);  */
+}
+
+.item {
+    position: absolute;
+    left: -22px;
+    top: -32px;
+    width: 44px;
+    height: 64px;
+    border-radius: 10px;
     display: flex;
-    align-items: center;
     justify-content: center;
-    color: white;
-    font-weight: bold;
-    font-size: 24px;
-    border-radius: 4px;
-    flex-shrink: 0;
+    align-items: center;
+    transform-origin: center center;
+    
+    /* CSS переменные будут обновляться */
+    --radius: var(--wheel-radius);
+    --scale: 1;
+    
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(var(--radius)) scale(var(--scale));
+    transition: transform 0.1s ease-out, box-shadow 0.1s ease-out, opacity 0.3s ease;
+    box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.15), 0 4px 0 rgba(0, 0, 0, 0.35);
 }
 
-.card.winner {
-    transform: scale(1.15);
-    z-index: 100;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-    transition: transform 0.5s ease-out;
+.item svg {
+    width: 24px;
+    height: 24px;
 }
 
-.red { background: red; }
-.black { background: black; }
-.green { background: green; }
+/* Состояние приподнятой ячейки */
+.item.lifted {
+    opacity: 1 !important;
+    filter: grayscale(0) !important;
+    --radius: 250px; /* Уменьшаем радиус, чтобы приблизить к центру (вверх) */
+    --scale: 1.15;
+    box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.3);
+    z-index: 10;
+}
+
+.yellow { background: linear-gradient(180deg, #8a6458 0%, #6d4b40 100%); }
+.blue { background: linear-gradient(180deg, #3764b8 0%, #254687 100%); }
+.teal { background: linear-gradient(180deg, #2b9c9d 0%, #197171 100%); }
+
+.game-layout{
+    position: relative;
+    width: 100%;
+    height: 200px;
+    background-color: transparent;
+    border-radius: 20px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid black;
+}
 
 #timer{
     width: 100%;
