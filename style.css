@@ -17,23 +17,29 @@ a {
 }
 
 h1 {
-    font-size: 5.15vw;
+    font-size: 20px;
     font-weight: normal;
     padding: 15px 0;
 }
 
 h2 {
-    font-size: 4.6vw;
+    font-size: 18px;
     font-weight: normal;
 }
 
 h3 {
-    font-size: 4.1vw;
+    font-size: 16px;
     font-weight: normal;
 }
 
 main {
     margin-top: 60px;
+    width: 100vw;
+    padding: 0 10px;
+}
+
+footer {
+    margin-top: 20px;
     width: 100vw;
     padding: 0 10px;
 }
@@ -71,7 +77,7 @@ nav {
 }
 
 .logo {
-    font-size: 24px;
+    font-size: 20px;
     font-weight: bold;
 }
 
@@ -178,7 +184,7 @@ nav {
     justify-content: start;
     align-items: end;
     padding: 10px 15px;
-    font-size: 4.1vw;
+    font-size: 16px;
     font-weight: bold;
 }
 
@@ -186,17 +192,10 @@ nav {
     grid-column: span 2;
     aspect-ratio: 5 / 1;
 
-    font-size: 4.6vw;
+    font-size: 18px;
     align-items: center;
     gap: 10px;
 }
 
-/* 1 */
-.object.active, .object .active {
-    display: flex;
-}
+/* Footer */
 
-/* Это теперь можем удалить */
-.object .active {
-    display: flex;
-}
