@@ -10,6 +10,8 @@ const iconRunner = `<svg viewBox="0 0 24 24" fill="rgba(255,255,255,0.8)"><path 
 const iconWings = `<svg viewBox="0 0 24 24" fill="rgba(255,255,255,0.8)"><path d="M11.99 15.35c-1.42 0-2.82.5-3.9 1.45-1.57-4.04-4.83-7.23-8.09-8.47 1.54 1.57 2.68 3.55 3.32 5.75.5-1.73 1.57-3.21 3.03-4.14-1.25 1.5-1.63 3.66-1 5.58 2.36-1.53 4.96-1.12 6.64.18 1.68-1.3 4.28-1.71 6.64-.18.63-1.92.25-4.08-1-5.58 1.46.93 2.53 2.41 3.03 4.14.64-2.2 1.78-4.18 3.32-5.75-3.26 1.24-6.52 4.43-8.09 8.47-1.08-.95-2.48-1.45-3.9-1.45z"/></svg>`;
 const iconSwords = `<svg viewBox="0 0 24 24" fill="rgba(255,255,255,0.8)"><path d="M12 2l2.3 4.7 5.2.8-3.8 3.7.9 5.2-4.6-2.4-4.6 2.4.9-5.2-3.8-3.7 5.2-.8L12 2z" transform="scale(0.5) translate(12, 0)"/><path d="M7 21l10-10m-10 0l10 10" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round"/></svg>`;
 
+let winnerColor;
+
 let currentType = 0;
 
 // Генерация ячеек
@@ -75,6 +77,7 @@ function updateLogic(now) {
         let progress = (now - animationStartTime) / SPIN_DURATION;
         
         if (progress >= 1) {
+            // alert(winnerColor)
             progress = 1;
             state = 'WAITING';
             labelDisplay.textContent = 'Ожидание...';
@@ -110,6 +113,8 @@ function startSpinning(now) {
     // Выбираем случайного победителя (индекс от 0 до 35)
     const targetIndex = Math.floor(Math.random() * totalItems);
     
+    getWinner(targetIndex);
+
     // Вращение по часовой стрелке. Ячейка с углом (i*10) будет в самом низу (0 градусов),
     // если итоговый поворот колеса компенсирует её угол.
     const rotations = 5; // Минимум 5 полных оборотов
@@ -160,6 +165,16 @@ function updateLiftingEffect() {
             item.classList.remove('lifted');
         }
     });
+}
+
+function getWinner(targetIndex) {
+    if (items[targetIndex].classList.contains('yellow')) {
+    winnerColor = 'yellow'
+    } else if (items[targetIndex].classList.contains('blue')) {
+    winnerColor = 'blue'
+    } else if (items[targetIndex].classList.contains('teal')) {
+    winnerColor = 'teal'
+    }
 }
 
 // Запуск цикла
