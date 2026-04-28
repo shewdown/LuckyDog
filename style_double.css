@@ -50,7 +50,6 @@
     z-index: 20;
     opacity: 0;
     transition: opacity 0.3s ease;
-    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6));
 }
 
 .arrow.visible {
@@ -122,7 +121,6 @@
 
 /* Состояние приподнятой ячейки */
 .item.lifted {
-    /* opacity: 1 !important; */
     filter: grayscale(0) !important;
     --radius: 250px; /* Уменьшаем радиус, чтобы приблизить к центру (вверх) */
     --scale: 1.15;
@@ -236,7 +234,8 @@
     display: flex;
     flex: 1; 
 
-    align-items: start;
+    flex-direction: column;
+    align-items: end;
     justify-content: right;
     padding: 5px;
 
@@ -247,12 +246,21 @@
 
 #bet-yellow {
     background-color: var(--yellow);
+    filter: grayscale(0) !important;
 }
 
 #bet-blue {
     background-color: var(--blue);
+    filter: grayscale(0) !important;
 }
 
 #bet-green {
     background-color: var(--green);
+    filter: grayscale(0) !important;
+}
+
+#bet-yellow.is-unactive, 
+#bet-blue.is-unactive, 
+#bet-green.is-unactive {
+    filter: grayscale(0.4) !important;
 }

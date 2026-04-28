@@ -63,6 +63,7 @@ function updateLogic(now) {
     lastFrameTime = now;
 
     if (state === 'COUNTDOWN') {
+        doButtonsToggleActive(true);
         timeLeft -= dt / 1000;
         if (timeLeft <= 0) {
             timeLeft = 0;
@@ -75,9 +76,11 @@ function updateLogic(now) {
     else if (state === 'SPINNING') {
         timeDisplay.textContent = '0.00s';
         let progress = (now - animationStartTime) / SPIN_DURATION;
-        
+        doButtonsToggleActive(false);
+
         if (progress >= 1) {
             getWinner();
+
             progress = 1;
             state = 'WAITING';
             labelDisplay.textContent = 'Ожидание...';
@@ -92,9 +95,13 @@ function updateLogic(now) {
     } 
     else if (state === 'WAITING') {
         let waitProgress = (now - animationStartTime) / 1000;
+        document.getElementById('total-bet-yellow').innerText = 0.00;
+        document.getElementById('total-bet-blue').innerText = 0.00;
+        document.getElementById('total-bet-green').innerText = 0.00;
         if (waitProgress >= 5) { // Ждем 5 секунд
             resetToCountdown();
         }
+        
         // Ячейка-победитель остается приподнятой
         updateLiftingEffect();
     }
@@ -169,26 +176,22 @@ function updateLiftingEffect() {
 
 // ставки
 
-let choisenColor = null;
+let possibleWnnings = new Map();
 
 function getWinner() {
-    const value = document.getElementById('bet-value');
     const balance = Number(document.getElementById('balic').innerText);
 
-    if(winnerColor === choisenColor) {
-        if(winnerColor === 'yellow') {
-            document.getElementById('balic').innerText = Number(document.getElementById('balic').innerText) + value.value * 14;
+    for (var [key, value] of possibleWnnings){
+        if(winnerColor === key) {
+            if(key === 'yellow') {
+                document.getElementById('balic').innerText = Number(document.getElementById('balic').innerText) + value * 14;
+            }
+            else {
+                document.getElementById('balic').innerText = Number(document.getElementById('balic').innerText) + value * 2;
+            }
         }
-        else {
-            document.getElementById('balic').innerText = Number(document.getElementById('balic').innerText) + value.value * 2;
-        }
     }
-    else if(choisenColor === null) {
-        
-    }
-    else if(winnerColor !== choisenColor) {
-        
-    }
+    possibleWnnings.clear();
 
     winnerColor = null;
 }
@@ -263,8 +266,10 @@ function choiseBtnYellow() {
     const balance = document.getElementById('balic').innerText;
 
     if(state === "COUNTDOWN" && value.value !== 0) {
-        choisenColor = 'yellow';
         document.getElementById('balic').innerText = Number(balance) - Number(value.value);
+        possibleWnnings.set("yellow", Number(value.value));
+        document.getElementById('total-bet-yellow').innerText = Number(document.getElementById('total-bet-yellow').innerText) + Number(value.value);
+        value.value = 0;
     }
 }
 
@@ -273,8 +278,10 @@ function choiseBtnGreen() {
     const balance = document.getElementById('balic').innerText;
 
     if(state === "COUNTDOWN" && value.value !== 0) {
-        choisenColor = 'green';
         document.getElementById('balic').innerText = Number(balance) - Number(value.value);
+        possibleWnnings.set("green", Number(value.value));
+        document.getElementById('total-bet-green').innerText = Number(document.getElementById('total-bet-green').innerText) + Number(value.value);
+        value.value = 0;
     }
 }
 
@@ -283,7 +290,25 @@ function choiseBtnBlue() {
     const balance = document.getElementById('balic').innerText;
 
     if(state === "COUNTDOWN" && value.value !== 0) {
-        choisenColor = 'blue';
         document.getElementById('balic').innerText = Number(balance) - Number(value.value);
+        possibleWnnings.set("blue", Number(value.value));
+        document.getElementById('total-bet-blue').innerText = Number(document.getElementById('total-bet-blue').innerText) + Number(value.value);
+        value.value = 0;
+    }
+}
+
+function doButtonsToggleActive(IsActive) {
+    const betYellow = document.getElementById('bet-yellow');
+    const betBlue = document.getElementById('bet-blue');
+    const betGreen = document.getElementById('bet-green');
+    if (IsActive === true) {
+        betYellow.classList.remove('is-unactive');
+        betBlue.classList.remove('is-unactive');
+        betGreen.classList.remove('is-unactive');
+    }
+    else {
+        betYellow.classList.add('is-unactive');
+        betBlue.classList.add('is-unactive');
+        betGreen.classList.add('is-unactive');
     }
 }
