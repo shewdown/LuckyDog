@@ -132,7 +132,7 @@
 
 .yellow { background: linear-gradient(180deg, var(--yellow) 0%, var(--yellow) 100%); }
 .blue { background: linear-gradient(180deg, var(--blue) 0%, var(--blue) 100%); }
-.teal { background: linear-gradient(180deg, var(--green) 0%, var(--green) 100%); }
+.green { background: linear-gradient(180deg, var(--green) 0%, var(--green) 100%); }
 
 .game-layout{
     position: relative;

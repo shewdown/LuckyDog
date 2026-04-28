@@ -25,7 +25,7 @@ for (let i = 0; i < totalItems; i++) {
         type = 'yellow';
         icon = iconRunner;
     } else {
-        type = currentType === 0 ? 'blue' : 'teal';
+        type = currentType === 0 ? 'blue' : 'green';
         icon = currentType === 0 ? iconWings : iconSwords;
         currentType = 1 - currentType;
     }
@@ -199,8 +199,8 @@ function getWinnerColor(targetIndex) {
     winnerColor = 'yellow'
     } else if (items[targetIndex].classList.contains('blue')) {
     winnerColor = 'blue'
-    } else if (items[targetIndex].classList.contains('teal')) {
-    winnerColor = 'teal'
+    } else if (items[targetIndex].classList.contains('green')) {
+    winnerColor = 'green'
     }
 }
 
@@ -268,12 +268,12 @@ function choiseBtnYellow() {
     }
 }
 
-function choiseBtnTeal() {
+function choiseBtnGreen() {
     let value = document.getElementById('bet-value');
     const balance = document.getElementById('balic').innerText;
 
     if(state === "COUNTDOWN" && value.value !== 0) {
-        choisenColor = 'teal';
+        choisenColor = 'green';
         document.getElementById('balic').innerText = Number(balance) - Number(value.value);
     }
 }
