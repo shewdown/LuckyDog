@@ -172,38 +172,29 @@ function updateLiftingEffect() {
 let choisenColor = null;
 
 function getWinner() {
+    const value = document.getElementById('bet-value');
+    const balance = Number(document.getElementById('balic').innerText);
+
     if(winnerColor === choisenColor) {
-        alert('победа, был цвет ' + winnerColor)
+        if(winnerColor === 'yellow') {
+            document.getElementById('balic').innerText = Number(document.getElementById('balic').innerText) + value.value * 14;
+        }
+        else {
+            document.getElementById('balic').innerText = Number(document.getElementById('balic').innerText) + value.value * 2;
+        }
+    }
+    else if(choisenColor === null) {
+        
     }
     else if(winnerColor !== choisenColor) {
-        alert('поражение, был цвет ' + winnerColor)
-    }
-    else if(choisenColor == null) {
-        alert('цвет не выбран ' + winnerColor) 
+        
     }
 
     winnerColor = null;
 }
 
-function choiseYellow() {
-    if(state === "COUNTDOWN") {
-        choisenColor = 'yellow'
-    }
-}
 
-function choiseTeal() {
-    if(state === "COUNTDOWN") {
-        choisenColor = 'teal'
-    }
-}
-
-function choiseBlue() {
-    if(state === "COUNTDOWN") {
-        choisenColor = 'blue'
-    }
-}
-
-function getWinnerColor(targetIndex){
+function getWinnerColor(targetIndex) {
     if (items[targetIndex].classList.contains('yellow')) {
     winnerColor = 'yellow'
     } else if (items[targetIndex].classList.contains('blue')) {
@@ -215,3 +206,84 @@ function getWinnerColor(targetIndex){
 
 // Запуск цикла
 requestAnimationFrame(updateLogic);
+
+
+
+// кнопки
+
+
+
+function plusBtnClick() {
+    const value = document.getElementById('bet-value');
+    const balance = Number(document.getElementById('balic').innerText);
+    
+    if(Number(balance) >= value.value + 1){
+        value.value = Number(value.value) + 1;
+    }
+    else {
+        value.value = balance;
+    }
+}
+
+function minusBtnClick() {
+    const value = document.getElementById('bet-value');
+
+    if(Number(value.value) > 0){
+        value.value = Number(value.value) - 1;
+    }
+}
+
+function semiBtnClick() {
+    const value = document.getElementById('bet-value');
+
+    value.value = Math.round(Number(value.value) / 2 * 100) / 100;
+}
+
+function allinBtnClick() {
+    const value = document.getElementById('bet-value');
+    const balance = Number(document.getElementById('balic').innerText);
+
+    value.value = balance;
+}
+
+function x2BtnClick() {
+    const value = document.getElementById('bet-value');
+    const balance = Number(document.getElementById('balic').innerText);
+
+    if(Number(balance) > Math.round(Number(value.value) * 2 * 100) / 100){
+        value.value = Math.round(Number(value.value) * 2 * 100) / 100;
+    }
+    else {
+        value.value = balance;
+    }
+}
+
+function choiseBtnYellow() {
+    let value = document.getElementById('bet-value');
+    const balance = document.getElementById('balic').innerText;
+
+    if(state === "COUNTDOWN" && value.value !== 0) {
+        choisenColor = 'yellow';
+        document.getElementById('balic').innerText = Number(balance) - Number(value.value);
+    }
+}
+
+function choiseBtnTeal() {
+    let value = document.getElementById('bet-value');
+    const balance = document.getElementById('balic').innerText;
+
+    if(state === "COUNTDOWN" && value.value !== 0) {
+        choisenColor = 'teal';
+        document.getElementById('balic').innerText = Number(balance) - Number(value.value);
+    }
+}
+
+function choiseBtnBlue() {
+    let value = document.getElementById('bet-value');
+    const balance = document.getElementById('balic').innerText;
+
+    if(state === "COUNTDOWN" && value.value !== 0) {
+        choisenColor = 'blue';
+        document.getElementById('balic').innerText = Number(balance) - Number(value.value);
+    }
+}

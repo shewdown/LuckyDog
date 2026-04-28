@@ -2,6 +2,10 @@
 
 :root {
     --wheel-radius: 250px;
+
+    --yellow: #d3b000;
+    --blue: #007bcd;
+    --green: #00ba88;
 }
 
 * {
@@ -88,7 +92,7 @@
 
 /* Когда колесо "активно" (крутится или показывает результат), приглушаем все ячейки */
 .wheel.is-active .item {
-    filter: grayscale(0.4); 
+    filter: grayscale(0.4);
 }
 
 .item {
@@ -126,9 +130,9 @@
     z-index: 10;
 }
 
-.yellow { background: linear-gradient(180deg, #8a6458 0%, #6d4b40 100%); }
-.blue { background: linear-gradient(180deg, #3764b8 0%, #254687 100%); }
-.teal { background: linear-gradient(180deg, #2b9c9d 0%, #197171 100%); }
+.yellow { background: linear-gradient(180deg, var(--yellow) 0%, var(--yellow) 100%); }
+.blue { background: linear-gradient(180deg, var(--blue) 0%, var(--blue) 100%); }
+.teal { background: linear-gradient(180deg, var(--green) 0%, var(--green) 100%); }
 
 .game-layout{
     position: relative;
@@ -147,8 +151,6 @@
     width: 100%;
     text-align: center;
     padding: 15px 0;
-
-    /* тест йоу */
 }
 
 /* bet */
@@ -238,7 +240,19 @@
     justify-content: right;
     padding: 5px;
 
-    border: 1px solid black;
+    border: none;
     border-radius: 10px;
-    background-color: transparent;
+    box-shadow: 0 2px 5px rgba(0,0,0, 0.2);
+}
+
+#bet-yellow {
+    background-color: var(--yellow);
+}
+
+#bet-blue {
+    background-color: var(--blue);
+}
+
+#bet-green {
+    background-color: var(--green);
 }
