@@ -1,65 +1,75 @@
-/* game */
-
+/* --- ОСНОВНЫЕ ПЕРЕМЕННЫЕ И СБРОС --- */
 :root {
     --wheel-radius: 250px;
-
     --yellow: #d3b000;
     --blue: #007bcd;
     --green: #00ba88;
+    --bg-card: rgba(255, 255, 255, 0.05);
+    --transition-fast: 0.2s ease;
+    --transition-smooth: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 * {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
     -webkit-tap-highlight-color: transparent;
 }
 
+/* --- КОНТЕЙНЕР ИГРЫ --- */
+.game-layout {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.25);
+}
+
+/* --- ТАЙМЕР И ИНФО --- */
 .timer-section {
-    margin-top: 15px;
+    position: relative;
+    margin-top: 20px;
     text-align: center;
-    z-index: 10;
+    z-index: 20;
 }
 
 .timer-section .time {
-    font-size: 32px;
+    font-size: 36px;
     font-weight: 800;
+    color: #323232;
     letter-spacing: 1px;
     font-variant-numeric: tabular-nums;
 }
 
 .timer-section .label {
-    font-size: 13px;
-    color: #a0a6b5;
-    margin-top: 5px;
+    font-size: 14px;
+    color: #323232;
+    font-weight: 700;
+    margin-top: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
+/* --- КОЛЕСО И ЕГО ЭЛЕМЕНТЫ --- */
 .wheel-container {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: transparent;
     overflow: hidden;
-}
-
-.arrow {
-    position: absolute;
-    top: 80px; 
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 20;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.arrow.visible {
-    opacity: 1;
+    pointer-events: none;
 }
 
 .wheel-center {
     position: absolute;
-    top: -100px; /* Смещение вниз для видимости ровно нижней четверти/трети */
+    top: -50px; /* Смещение центра колеса за пределы видимости сверху */
     left: 50%;
+    transform: translateX(-50%);
 }
 
 .wheel-bg {
@@ -67,40 +77,56 @@
     top: 0;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 600px;
-    height: 600px;
+    width: 650px;
+    height: 650px;
     border-radius: 50%;
-    background-color: transparent;
     background-image: 
-        radial-gradient(circle at center, transparent 65%, rgba(0,0,0,0.2) 75%, transparent 100%),
+        radial-gradient(circle at center, transparent 65%, rgba(0,0,0,0.3) 85%, transparent 100%),
         linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-    background-size: 100% 100%, 20px 20px, 20px 20px;
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05), inset 0 0 50px rgba(0,0,0,0.5);
+    background-size: 100% 100%, 30px 30px, 30px 30px;
+    box-shadow: inset 0 0 80px rgba(0,0,0,0.8);
 }
 
 .wheel {
     position: absolute;
     top: 0;
     left: 0;
-    width: 0;
-    height: 0;
-    z-index: 5;
-    /* Анимация вращения управляется через JS (requestAnimationFrame) */
+    will-change: transform;
 }
 
-/* Когда колесо "активно" (крутится или показывает результат), приглушаем все ячейки */
-.wheel.is-active .item {
-    filter: grayscale(0.4);
+/* Декоративные кольца */
+.wheel-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    pointer-events: none;
 }
 
+/* Внешнее кольцо (над ячейками) */
+.wheel-ring.outer {
+    width: calc(var(--wheel-radius) * 2 + 80px);
+    height: calc(var(--wheel-radius) * 2 + 80px);
+    border: 2px solid rgba(0, 123, 205, 0.15);
+}
+
+/* Внутреннее кольцо (под ячейками) */
+.wheel-ring.inner {
+    width: calc(var(--wheel-radius) * 2 - 80px);
+    height: calc(var(--wheel-radius) * 2 - 80px);
+    border: 2px solid rgba(0, 123, 205, 0.1);
+}
+
+/* Элементы (ячейки) */
 .item {
     position: absolute;
-    left: -22px;
-    top: -32px;
-    width: 44px;
-    height: 64px;
-    border-radius: 10px;
+    left: -20px;
+    top: -30px;
+    width: 40px;
+    height: 60px;
+    border-radius: 8px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -109,158 +135,190 @@
     --radius: var(--wheel-radius);
     --scale: 1;
     
-    filter: grayscale(0);
     transform: rotate(var(--angle)) translateY(var(--radius)) scale(var(--scale));
-    transition: transform 0.1s ease-out, box-shadow 0.1s ease-out, opacity 0.3s ease;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }
 
 .item svg {
-    width: 24px;
-    height: 24px;
+    width: 26px;
+    height: 26px;
 }
 
-/* Состояние приподнятой ячейки */
+/* Цвета ячеек */
+.yellow { background: linear-gradient(180deg, #ffcc00, var(--yellow)); }
+.blue { background: linear-gradient(180deg, #0095ff, var(--blue)); }
+.green { background: linear-gradient(180deg, #00e6a8, var(--green)); }
+
+/* Состояния колеса */
+.wheel.is-active .item {
+    filter: brightness(0.6) grayscale(0.3);
+}
+
 .item.lifted {
-    filter: grayscale(0) !important;
-    --radius: 250px; /* Уменьшаем радиус, чтобы приблизить к центру (вверх) */
-    --scale: 1.15;
-    box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.3);
-    z-index: 10;
+    filter: brightness(1.1) grayscale(0) !important;
+    --radius: calc(var(--wheel-radius) - 5px);
+    --scale: 1.2;
+    z-index: 100;
+    box-shadow: 0 0 20px rgba(255,255,255,0.2), inset 0 0 10px rgba(255,255,255,0.3);
 }
 
-.yellow { background: linear-gradient(180deg, var(--yellow) 0%, var(--yellow) 100%); }
-.blue { background: linear-gradient(180deg, var(--blue) 0%, var(--blue) 100%); }
-.green { background: linear-gradient(180deg, var(--green) 0%, var(--green) 100%); }
+/* --- УКАЗАТЕЛЬ (СТРЕЛКА) --- */
+.arrow {
+    position: absolute;
+    top: 125px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 30;
+    opacity: 0;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
 
-.game-layout{
-    position: relative;
+.arrow.visible {
+    opacity: 1;
+}
+
+/* --- ИСТОРИЯ ИГР --- */
+
+.history-games-container {
+    position: absolute;
     width: 100%;
-    height: 200px;
-    background-color: transparent;
-    border-radius: 10px;
-    overflow: hidden;
+    bottom: 0;
+    padding: 15px 20px;
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    border: 1px solid black;
+    justify-content: start;
+    gap: 5px;
 }
 
-#timer{
-    width: 100%;
-    text-align: center;
-    padding: 15px 0;
+.history-game {
+    background-color: var(--blue);
+    height: 15px;
+    width: 30px;
+    border-radius: 5px;
 }
 
-/* bet */
-
-.bet-layout{
+/* --- БЛОК СТАВОК --- */
+.bet-layout {
     width: 100%;
-
-    margin-top: 10px;
+    margin-top: 15px;
     padding: 15px;
-    display: flex;
-    flex-direction: column;
-
-    border: 1px solid black;
     border-radius: 10px;
-    background-color: transparent;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.25);
 }
 
-.enter-bet{
+.enter-bet {
     width: 100%;
-    height: 70px;
-
+    height: 60px;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
-
-    border: 1px solid black;
+    padding: 0 10px;
     border-radius: 10px;
-    background-color: transparent;
+    margin-bottom: 12px;
+    font-family: 'Inter', sans-serif;
+    border: 1px solid #e1e1e1;
+    box-shadow: 0 2px 5px #e1e1e1;
 }
 
-.enter-bet button{
-    height: 35px;
-    width: 35px;
-    
-    font-size: 20px;
-
-    border: none;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    border-radius: 10px;
-    background-color: rgb(0, 0, 0, 0.1);
-}
-
-#bet-value{
+.enter-bet input {
+    width: 100px;
     border: none;
     outline: none;
-    background-color: transparent;
-
+    background: transparent;
     text-align: center;
+
+    color: #9499a5;
+    font-weight: 800;
+    font-size: 18px;
 }
 
-.bnts-bet{
+.enter-bet button {
+    height: 40px;
+    width: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+    border: 1px solid #e1e1e1;
+    box-shadow: 0 2px 5px #e1e1e1;
+    border-radius: 8px;
+    transition: var(--transition-fast);
+
+    color: #9499a5;
+    font-weight: 800;
+    font-size: 18px;
+}
+
+/* Быстрые кнопки (1/2, x2, All-in) */
+.bnts-bet {
     width: 100%;
+    height: 60px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+}
+
+.bnts-bet button {
+    flex: 1;
+    height: 44px;
+    border-radius: 10px;
+    background: transparent;
+    transition: var(--transition-fast);
+    
+    border: 1px solid #e1e1e1;
+    box-shadow: 0 2px 5px #e1e1e1;
 
     display: flex;
-    gap: 10px;
-}
+    justify-content: center;
+    align-items: center;
 
-.bnts-bet button{
-    flex: 1;
-    height: 40px;
-
-    margin-top: 10px;
-
-    border: 1px solid black;
-    border-radius: 10px;
-    background-color: transparent;
+    color: #9499a5;
+    font-weight: 800;
+    font-size: 18px;
 }
 
 .bnts-bet button:not(:first-child, :last-child) {
-    flex: 5;
+    flex: 4;
 }
 
-.color-bet{
-    width: 100%;
-    height: 50px;
+/* Кнопки выбора цвета */
+.color-bet {
+    display: flex;
     gap: 10px;
-
-    display: flex;
-    margin-top: 10px;
+    height: 50px;
 }
 
-.color-bet button{
+.color-bet button {
+    flex: 1;
+    position: relative;
     display: flex;
-    flex: 1; 
-
     flex-direction: column;
-    align-items: end;
-    justify-content: right;
-    padding: 5px;
-
+    justify-content: center;
+    align-items: center;
+    padding: 0 10px;
     border: none;
     border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0, 0.2);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    overflow: hidden;
+    color: white;
+    font-weight: 600;
+    font-size: 16px;
 }
 
-#bet-yellow {
-    background-color: var(--yellow);
-    filter: grayscale(0) !important;
+/* Эффект неактивности (во время спина) */
+.color-bet button.is-unactive {
+    filter: grayscale(0.4) brightness(0.8);
+    cursor: not-allowed;
 }
 
-#bet-blue {
-    background-color: var(--blue);
-    filter: grayscale(0) !important;
-}
+#bet-yellow { background: var(--yellow); box-shadow: 0 4px 15px rgba(211, 176, 0, 0.5); }
+#bet-blue   { background: var(--blue);   box-shadow: 0 4px 15px rgba(0, 123, 205, 0.5); }
+#bet-green  { background: var(--green);  box-shadow: 0 4px 15px rgba(0, 186, 136, 0.5); }
 
-#bet-green {
-    background-color: var(--green);
-    filter: grayscale(0) !important;
-}
-
-#bet-yellow.is-unactive, 
-#bet-blue.is-unactive, 
-#bet-green.is-unactive {
-    filter: grayscale(0.4) !important;
+.color-bet button:active:not(.is-unactive) {
+    transform: translateY(2px);
 }

@@ -81,25 +81,27 @@ nav {
 }
 
 .logo {
-    font-size: 20px;
-    font-weight: bold;
-    cursor: pointer;
+    color: #323232;
+    font-weight: 800;
+    font-size: 18px;
 }
 
 .balance {
     margin-left: auto;
     line-height: 30px;
     height: 30px;
-    font-size: 16px;
-    font-weight: bold;
+    color: #323232;
+    font-weight: 800;
+    font-size: 18px;
 }
 
 .profile {
     width: 25px;
     height: 25px;
 
-    background-color: black;
+    background-color: #fff;
     border-radius: 50%;
+    border: 2px solid #000;
 }
 
 /* Sidebar */
@@ -116,7 +118,7 @@ nav {
     right: -250px;
     z-index: 200;
 
-    background-color:rgb(255, 255, 255, 1);
+    background-color:rgb(255, 255, 255, 0.66);
     backdrop-filter: blur(10px);
 
     transition: right 150ms ease-in-out;
@@ -138,7 +140,10 @@ nav {
 }
 
 #sidebar a {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
     font-size: 18px;
+    color: #323232;
 }
 
 #overlay {
