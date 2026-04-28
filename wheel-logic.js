@@ -178,7 +178,7 @@ function getWinner() {
     else if(winnerColor !== choisenColor) {
         alert('поражение, был цвет ' + winnerColor)
     }
-    else if(choisenColor === null) {
+    else if(choisenColor == null) {
         alert('цвет не выбран ' + winnerColor) 
     }
 
