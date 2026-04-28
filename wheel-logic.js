@@ -6,11 +6,11 @@ const arrow = document.getElementById('arrow');
 const totalItems = 36;
 const items = [];
 
+let winnerColor = null;
+
 const iconRunner = `<svg viewBox="0 0 24 24" fill="rgba(255,255,255,0.8)"><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7"/></svg>`;
 const iconWings = `<svg viewBox="0 0 24 24" fill="rgba(255,255,255,0.8)"><path d="M11.99 15.35c-1.42 0-2.82.5-3.9 1.45-1.57-4.04-4.83-7.23-8.09-8.47 1.54 1.57 2.68 3.55 3.32 5.75.5-1.73 1.57-3.21 3.03-4.14-1.25 1.5-1.63 3.66-1 5.58 2.36-1.53 4.96-1.12 6.64.18 1.68-1.3 4.28-1.71 6.64-.18.63-1.92.25-4.08-1-5.58 1.46.93 2.53 2.41 3.03 4.14.64-2.2 1.78-4.18 3.32-5.75-3.26 1.24-6.52 4.43-8.09 8.47-1.08-.95-2.48-1.45-3.9-1.45z"/></svg>`;
 const iconSwords = `<svg viewBox="0 0 24 24" fill="rgba(255,255,255,0.8)"><path d="M12 2l2.3 4.7 5.2.8-3.8 3.7.9 5.2-4.6-2.4-4.6 2.4.9-5.2-3.8-3.7 5.2-.8L12 2z" transform="scale(0.5) translate(12, 0)"/><path d="M7 21l10-10m-10 0l10 10" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round"/></svg>`;
-
-let winnerColor;
 
 let currentType = 0;
 
@@ -77,7 +77,7 @@ function updateLogic(now) {
         let progress = (now - animationStartTime) / SPIN_DURATION;
         
         if (progress >= 1) {
-            // alert(winnerColor)
+            getWinner();
             progress = 1;
             state = 'WAITING';
             labelDisplay.textContent = 'Ожидание...';
@@ -113,7 +113,7 @@ function startSpinning(now) {
     // Выбираем случайного победителя (индекс от 0 до 35)
     const targetIndex = Math.floor(Math.random() * totalItems);
     
-    getWinner(targetIndex);
+    getWinnerColor(targetIndex);
 
     // Вращение по часовой стрелке. Ячейка с углом (i*10) будет в самом низу (0 градусов),
     // если итоговый поворот колеса компенсирует её угол.
@@ -167,7 +167,43 @@ function updateLiftingEffect() {
     });
 }
 
-function getWinner(targetIndex) {
+// ставки
+
+let choisenColor = null;
+
+function getWinner() {
+    if(winnerColor === choisenColor) {
+        alert('победа, был цвет ' + winnerColor)
+    }
+    else if(winnerColor !== choisenColor) {
+        alert('поражение, был цвет ' + winnerColor)
+    }
+    else if(choisenColor === null) {
+        alert('цвет не выбран ' + winnerColor) 
+    }
+
+    winnerColor = null;
+}
+
+function choiseYellow() {
+    if(state === "COUNTDOWN") {
+        choisenColor = 'yellow'
+    }
+}
+
+function choiseTeal() {
+    if(state === "COUNTDOWN") {
+        choisenColor = 'teal'
+    }
+}
+
+function choiseBlue() {
+    if(state === "COUNTDOWN") {
+        choisenColor = 'blue'
+    }
+}
+
+function getWinnerColor(targetIndex){
     if (items[targetIndex].classList.contains('yellow')) {
     winnerColor = 'yellow'
     } else if (items[targetIndex].classList.contains('blue')) {
