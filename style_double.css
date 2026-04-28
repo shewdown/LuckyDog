@@ -124,7 +124,7 @@
 /* Состояние приподнятой ячейки */
 .item.lifted {
     opacity: 1 !important;
-    /* filter: grayscale(0) !important; */
+    filter: grayscale(0) !important;
     --radius: 250px; /* Уменьшаем радиус, чтобы приблизить к центру (вверх) */
     --scale: 1.15;
     box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.3);
