@@ -21,6 +21,17 @@ let timeLeft = COUNTDOWN_DURATION;
 let lastFrameTime = performance.now();
 let winnerColor = null;
 
+window.onload = function() {
+    const savedHistory = localStorage.getItem('colorHistory');
+    
+    if (savedHistory) {
+        // Превращаем строку обратно в массив
+        history = JSON.parse(savedHistory);
+        
+        renderHistory(); 
+    }
+};
+
 // Хранилище ставок: цвет -> сумма
 let possibleWnnings = new Map();
 
@@ -250,5 +261,6 @@ function doButtonsToggleActive(isActive) {
 }
 
 // --- ЗАПУСК ---
+
 initWheel();
 requestAnimationFrame(updateLogic);

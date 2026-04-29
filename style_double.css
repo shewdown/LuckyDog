@@ -180,20 +180,41 @@
 
 /* --- ИСТОРИЯ ИГР --- */
 
-.history-games-container {
+.wrapper {
     position: absolute;
     width: 100%;
-    bottom: 0;
-    padding: 15px 20px;
+    height: 20px;
+    left: 20px;
+    bottom: 10px;
+}
+
+#history-games-container {
+    width: 90%;
+    overflow-x: auto;
     display: flex;
     justify-content: start;
     gap: 5px;
+
+    &::-webkit-scrollbar {display: none;}
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.wrapper::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(to right, transparent 10%, white 90%);
+  pointer-events: none;
+  z-index: 10;
 }
 
 .history-game {
-    background-color: var(--blue);
     height: 15px;
-    width: 30px;
+    flex: 0 0 30px;
     border-radius: 5px;
 }
 
