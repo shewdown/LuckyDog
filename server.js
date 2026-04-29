@@ -1,20 +1,26 @@
+// --- server.js ---
 const express = require('express');
 const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const path = require('path');
 
-// --- КОНСТАНТЫ ---
 const TOTAL_ITEMS = 40;
 const SPIN_DURATION = 10000;
 const WAIT_DURATION = 5000;
-const COUNTDOWN_DURATION = 10;
+const COUNTDOWN_DURATION = 10.0;
 
-// Состояние игры на сервере
 let state = 'COUNTDOWN'; 
 let timeLeft = COUNTDOWN_DURATION;
 let winnerIndex = null;
 let winnerColor = null;
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+function getColorByIndex(i) {
+    if (i % 10 === 0) return 'yellow';
+    return (i % 2 === 1) ? 'blue' : 'green';
+}
 
 setInterval(() => {
     if (state === 'COUNTDOWN') {
@@ -25,9 +31,7 @@ setInterval(() => {
         }
     } else if (state === 'WAITING') {
         timeLeft -= 0.1;
-        if (timeLeft <= 0) {
-            resetGame();
-        }
+        if (timeLeft <= 0) resetGame();
     }
 
     io.emit('gameTick', {
@@ -42,11 +46,7 @@ function startSpinning() {
     state = 'SPINNING';
     winnerIndex = Math.floor(Math.random() * TOTAL_ITEMS);
     winnerColor = getColorByIndex(winnerIndex);
-
-    io.emit('commandSpin', {
-        targetIndex: winnerIndex,
-        duration: SPIN_DURATION
-    });
+    io.emit('commandSpin', { targetIndex: winnerIndex, duration: SPIN_DURATION });
 
     setTimeout(() => {
         state = 'WAITING';
@@ -60,3 +60,5 @@ function resetGame() {
     winnerIndex = null;
     winnerColor = null;
 }
+
+http.listen(3000, () => console.log('Сервер: http://localhost:3000'));

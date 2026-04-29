@@ -1,3 +1,7 @@
+let state = 'COUNTDOWN';
+let timeLeft = 0;
+let winnerColor = null;
+
 const TOTAL_ITEMS = 40;
 const ITEM_ANGLE = 360 / TOTAL_ITEMS;
 const SPIN_DURATION = 10000;
@@ -96,48 +100,69 @@ function updateLogic(now) {
     const dt = now - lastFrameTime;
     lastFrameTime = now;
 
-    if (state === 'COUNTDOWN') {
-        doButtonsToggleActive(true);
-        timeLeft -= dt / 1000;
-        if (timeLeft <= 0) {
-            timeLeft = 0;
-            startSpinning(now);
-        } else {
-            timeDisplay.textContent = timeLeft.toFixed(2) + 's';
-        }
-        updateLiftingEffect();
-    } 
-    else if (state === 'SPINNING') {
-        timeDisplay.textContent = '0.00s';
+    if (state === 'SPINNING') {
         let progress = (now - animationStartTime) / SPIN_DURATION;
-        doButtonsToggleActive(false);
-
+        
         if (progress >= 1) {
-            // Добавление игры в историю
-            const history_games = document.getElementById('history-games-container');
-            const history_game = document.createElement('div');
-            history_game.classList.add('history-game');
-            history_game.style.backgroundColor = `var(--${winnerColor})`;
-            history_games.prepend(history_game);
-
             progress = 1;
-            calculateResult();
             state = 'WAITING';
-            labelDisplay.textContent = 'Поздравляем победителей!';
-            animationStartTime = now;
+            
+            addToHistory(winnerColor);
         }
 
         currentRotation = startRotation + (targetRotation - startRotation) * easeOutQuart(progress);
         wheel.style.transform = `rotate(${currentRotation}deg)`;
-        updateLiftingEffect();
-    } 
-    else if (state === 'WAITING') {
-        let waitProgress = (now - animationStartTime);
-        if (waitProgress >= WAIT_DURATION) {
-            resetToCountdown();
-        }
-        updateLiftingEffect();
     }
 
+    updateLiftingEffect();
     requestAnimationFrame(updateLogic);
+}
+
+function updateLiftingEffect() {
+    if (state === 'COUNTDOWN') {
+        items.forEach(item => item.classList.remove('lifted'));
+        return;
+    }
+
+    let closestIndex = -1;
+    let minDifference = Infinity;
+
+    for (let i = 0; i < TOTAL_ITEMS; i++) {
+        let itemAbsoluteAngle = (i * ITEM_ANGLE + currentRotation) % 360;
+        if (itemAbsoluteAngle < 0) itemAbsoluteAngle += 360;
+
+        let difference = Math.min(itemAbsoluteAngle, 360 - itemAbsoluteAngle);
+        if (difference < minDifference) {
+            minDifference = difference;
+            closestIndex = i;
+        }
+    }
+
+    items.forEach((item, index) => {
+        index === closestIndex ? item.classList.add('lifted') : item.classList.remove('lifted');
+    });
+}
+
+function setWinnerColor(targetIndex) {
+    const item = items[targetIndex];
+    if (item.classList.contains('yellow'))winnerColor = 'yellow';
+    else if (item.classList.contains('blue')) winnerColor = 'blue';
+    else if (item.classList.contains('green')) winnerColor = 'green';
+}
+
+function easeOutQuart(x) {
+    return 1 - Math.pow(1 - x, 4);
+}
+
+function resetVisuals() {
+    wheel.classList.remove('is-active');
+    arrow.classList.remove('visible');
+}
+
+function addToHistory(winnerColor){
+    const history_games = document.getElementById('history-games-container');
+    const history_game = document.createElement('div');
+    history_game.classList.add('history-game');
+    history_game.style.backgroundColor = `var(--${winnerColor})`;
+    history_games.prepend(history_game);
 }
