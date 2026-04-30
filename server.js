@@ -5,6 +5,10 @@ const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const path = require('path');
+const { constants } = require('buffer');
+
+const {setubDb, registerUser, getUserByLogin, registerGame} = require('./database');
+let db;
 
 const TOTAL_ITEMS = 40;
 const SPIN_DURATION = 10000;
@@ -16,13 +20,9 @@ let state = 'COUNTDOWN';
 let timeLeft = COUNTDOWN_DURATION;
 let winnerIndex = null;
 let winnerColor = null;
+let lastRotation = 0;
 
-let gameState = {
-    isSpinning: false,
-    startTime: null,
-    duration: SPIN_DURATION,
-    targetIndex: Math.floor(Math.random() * TOTAL_ITEMS)
-}
+let gameState = {};
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
@@ -68,33 +68,36 @@ setInterval(() => {
     });
 }, 100);
 
-
-
 function startSpinning() {
     state = 'SPINNING';
     
     winnerIndex = Math.floor(Math.random() * TOTAL_ITEMS);
     winnerColor = getColorByIndex(winnerIndex);
 
+    const ITEM_ANGLE = 360 / TOTAL_ITEMS;
+    const rotations = 5;
+    const baseSpins = rotations * 360;
+    const targetRotation = Math.ceil(lastRotation / 360) * 360 + baseSpins + (360 - winnerIndex * ITEM_ANGLE);
+
     gameState = {
         state: 'SPINNING',
         startTime: Date.now(),
         targetIndex: winnerIndex,
+        targetRotation: targetRotation,
+        startRotation: lastRotation,
         duration: SPIN_DURATION
     };
 
-    io.emit('commandSpin', { 
-        targetIndex: gameState.targetIndex, 
-        duration: gameState.duration,
-        startTime: gameState.startTime
-    });
+    io.emit('commandSpin', gameState);
 
     setTimeout(() => {
         state = 'WAITING';
+        lastRotation = targetRotation;
         timeLeft = WAIT_DURATION / 1000;
         gameState.state = 'WAITING';
+        
+        saveResultToFile(winnerColor);
     }, SPIN_DURATION);
-    saveResultToFile(winnerColor);
 }
 
 function resetGame() {
@@ -118,4 +121,23 @@ function saveResultToFile(color) {
     fs.writeFileSync(FILE_PATH, JSON.stringify(history, null, 2));
 }
 
-http.listen(3000, () => console.log('Сервер: http://localhost:3000'));
+// База данных
+
+app.post('/api/register', async (req, res) => {
+    try {
+        const { login, password } = req.body;
+        await registerUser(db, login, password);
+        res.json({ success: true, message: "Пользователь создан!" });
+    } catch (err) {
+        res.status(400).json({ success: false, error: "Логин занят или ошибка БД" });
+    }
+});
+
+// Запуск
+setubDb().then((database) => {
+    db = database;
+
+    app.listen(3000, () => {
+        console.log('Сервер: http://localhost:3000');
+    });
+});

@@ -44,6 +44,11 @@ socket.on('sync-game', (data) => {
             startSpinningFromServer(data.targetIndex, data.duration, elapsed);
         }
     }
+    else{
+        wheel.classList.add('is-active');
+        currentRotation = data.targetRotation || 0;
+        wheel.style.transform = `rotate(${currentRotation}deg)`;
+    }
 });
 
 // Слушаем тики сервера
@@ -52,6 +57,7 @@ socket.on('gameTick', (data) => {
     
     if (state === 'COUNTDOWN') {
         timeLeft = data.timeLeft;
+        wheel.classList.remove('is-active');
         timeDisplay.textContent = timeLeft + 's';
         labelDisplay.textContent = 'До начала раунда';
     }
@@ -64,8 +70,8 @@ socket.on('gameTick', (data) => {
 
 // Слушаем команду на старт вращения
 socket.on('commandSpin', (data) => {
-    startSpinningFromServer(data.targetIndex);
-
+    startSpinningFromServer(data.targetIndex, data.duration, 0, data.startRotation, data.targetRotation);
+    
     timeDisplay.textContent = '';
     labelDisplay.textContent = 'Крутим...';
 });
@@ -179,14 +185,6 @@ function resetVisuals() {
     arrow.classList.remove('visible');
 }
 
-function addToHistory(winnerColor){
-    const history_games = document.getElementById('history-games-container');
-    const history_game = document.createElement('div');
-    history_game.classList.add('history-game');
-    history_game.style.backgroundColor = `var(--${winnerColor})`;
-    history_games.prepend(history_game);
-}
-
 async function loadHistory() {
     const response = await fetch('http://localhost:3000/get-history');
     const history = await response.json();
@@ -247,7 +245,6 @@ function placeBet(color) {
     if (state === "COUNTDOWN" && amount > 0 && balance >= amount) {
         balicDisplay.innerText = (balance - amount).toFixed(2);
         
-        // Суммируем ставку, если игрок ставит несколько раз на один цвет
         const existingBet = possibleWnnings.get(color) || 0;
         possibleWnnings.set(color, existingBet + amount);
         
