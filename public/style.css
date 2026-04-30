@@ -1,3 +1,8 @@
+.game-modes h1 {
+    color: #f1f1f1;
+    font-weight: 600;
+}
+
 /* Grid-cards */
 
 .grid-cards {
@@ -11,16 +16,23 @@
     width: 100%;
     aspect-ratio: 5 / 2;
 
-    border: 1px solid black;
     border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border: 1px solid transparent;
 
     display: flex;
     justify-content: start;
     align-items: end;
     padding: 10px 15px;
+
+    color: #f1f1f1;
+    font-family: 'Inter', sans-serif;
     font-size: 16px;
-    font-weight: bold;
+    font-weight: 800;
+
+    background-color:rgb(255, 255, 255, 0.3);
+    backdrop-filter: blur(5px);
+
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
 }
 
 .grid-card:last-child {
@@ -31,6 +43,3 @@
     align-items: center;
     gap: 10px;
 }
-
-/* Footer */
-
