@@ -11,6 +11,7 @@ const wheel = document.getElementById('wheel');
 const timeDisplay = document.getElementById('timeDisplay');
 const labelDisplay = document.getElementById('labelDisplay');
 const arrow = document.getElementById('arrow');
+const balicDisplay = document.getElementById('balic');
 
 const iconRunner = `<svg viewBox="0 0 24 24" fill="rgba(255,255,255,0.8)"><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7"/></svg>`;
 const iconWings = `<svg viewBox="0 0 24 24" fill="rgba(255,255,255,0.8)"><path d="M11.99 15.35c-1.42 0-2.82.5-3.9 1.45-1.57-4.04-4.83-7.23-8.09-8.47 1.54 1.57 2.68 3.55 3.32 5.75.5-1.73 1.57-3.21 3.03-4.14-1.25 1.5-1.63 3.66-1 5.58 2.36-1.53 4.96-1.12 6.64.18 1.68-1.3 4.28-1.71 6.64-.18.63-1.92.25-4.08-1-5.58 1.46.93 2.53 2.41 3.03 4.14.64-2.2 1.78-4.18 3.32-5.75-3.26 1.24-6.52 4.43-8.09 8.47-1.08-.95-2.48-1.45-3.9-1.45z"/></svg>`;
@@ -27,7 +28,23 @@ initWheel(); // Инициализируем колесо
 
 const socket = io(); // Подключаемся к серверу
 
-requestAnimationFrame(updateLogic); // запускаем цикл отрисовки анимаций
+requestAnimationFrame(updateLogic); // Запускаем цикл отрисовки анимаций
+
+loadHistory();
+
+socket.on('sync-game', (data) => {
+    if (data.state === 'SPINNING') {
+        const now = Date.now();
+        const elapsed = now - data.startTime;
+
+        timeDisplay.textContent = '';
+        labelDisplay.textContent = 'Крутим...';
+
+        if (elapsed < data.duration) {
+            startSpinningFromServer(data.targetIndex, data.duration, elapsed);
+        }
+    }
+});
 
 // Слушаем тики сервера
 socket.on('gameTick', (data) => {
@@ -40,29 +57,32 @@ socket.on('gameTick', (data) => {
     }
     
     if (state === 'WAITING') {
+        timeDisplay.textContent = '';
         labelDisplay.textContent = 'Поздравляем победителей!';
     }
 });
 
-// Слушаем конкретную команду на старт вращения
+// Слушаем команду на старт вращения
 socket.on('commandSpin', (data) => {
     startSpinningFromServer(data.targetIndex);
+
+    timeDisplay.textContent = '';
+    labelDisplay.textContent = 'Крутим...';
 });
 
-function startSpinningFromServer(targetIndex) {
+function startSpinningFromServer(targetIndex, duration, elapsed = 0) {
     state = 'SPINNING';
     wheel.classList.add('is-active');
     arrow.classList.add('visible');
-    labelDisplay.textContent = 'Крутим...';
     
-    animationStartTime = performance.now();
+    animationStartTime = performance.now() - elapsed; 
     startRotation = currentRotation;
 
     setWinnerColor(targetIndex);
 
     const rotations = 5; 
     const baseSpins = rotations * 360;
-
+    
     targetRotation = Math.ceil(startRotation / 360) * 360 + baseSpins + (360 - targetIndex * ITEM_ANGLE);
 }
 
@@ -106,8 +126,8 @@ function updateLogic(now) {
         if (progress >= 1) {
             progress = 1;
             state = 'WAITING';
-            
-            addToHistory(winnerColor);
+
+            loadHistory();
         }
 
         currentRotation = startRotation + (targetRotation - startRotation) * easeOutQuart(progress);
@@ -165,4 +185,87 @@ function addToHistory(winnerColor){
     history_game.classList.add('history-game');
     history_game.style.backgroundColor = `var(--${winnerColor})`;
     history_games.prepend(history_game);
+}
+
+async function loadHistory() {
+    const response = await fetch('http://localhost:3000/get-history');
+    const history = await response.json();
+
+    const historyContainer = document.getElementById('history-games-container');
+    historyContainer.innerHTML = '';
+
+    history.forEach(game => {
+        const div = document.createElement('div');
+        div.classList.add('history-game');
+        div.style.backgroundColor = `var(--${game.winnerColor})`;
+        historyContainer.appendChild(div);
+    });
+}
+
+function calculateResult() {
+    let currentBalance = Number(balicDisplay.innerText);
+
+    for (let [color, betAmount] of possibleWnnings) {
+        if (winnerColor === color) {
+            const multiplier = (color === 'yellow') ? 14 : 2;
+            currentBalance += betAmount * multiplier;
+        }
+    }
+
+    balicDisplay.innerText = currentBalance.toFixed(2);
+    possibleWnnings.clear();
+    winnerColor = null;
+}
+
+function plusBtnClick() { updateBetInput('plus'); }
+function minusBtnClick() { updateBetInput('minus'); }
+function semiBtnClick() { updateBetInput('half'); }
+function x2BtnClick() { updateBetInput('x2'); }
+function allinBtnClick() { updateBetInput('all'); }
+
+function updateBetInput(modifier) {
+    const input = document.getElementById('bet-value');
+    const balance = Number(balicDisplay.innerText);
+    let val = Number(input.value);
+
+    switch(modifier) {
+        case 'plus': val += 1; break;
+        case 'minus': val = Math.max(0, val - 1); break;
+        case 'half': val = val / 2; break;
+        case 'x2': val = val * 2; break;
+        case 'all': val = balance; break;
+    }
+
+    input.value = Math.min(val, balance).toFixed(2);
+}
+
+function placeBet(color) {
+    const input = document.getElementById('bet-value');
+    const amount = Number(input.value);
+    const balance = Number(balicDisplay.innerText);
+
+    if (state === "COUNTDOWN" && amount > 0 && balance >= amount) {
+        balicDisplay.innerText = (balance - amount).toFixed(2);
+        
+        // Суммируем ставку, если игрок ставит несколько раз на один цвет
+        const existingBet = possibleWnnings.get(color) || 0;
+        possibleWnnings.set(color, existingBet + amount);
+        
+        const displayId = `total-bet-${color}`;
+        document.getElementById(displayId).innerText = (Number(document.getElementById(displayId).innerText) + amount).toFixed(2);
+        
+        input.value = 0;
+    }
+}
+
+function choiseBtnYellow() { placeBet('yellow'); }
+function choiseBtnGreen() { placeBet('green'); }
+function choiseBtnBlue() { placeBet('blue'); }
+
+function doButtonsToggleActive(isActive) {
+    const buttons = ['bet-yellow', 'bet-blue', 'bet-green'];
+    buttons.forEach(id => {
+        const btn = document.getElementById(id);
+        isActive ? btn.classList.remove('is-unactive') : btn.classList.add('is-unactive');
+    });
 }
