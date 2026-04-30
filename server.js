@@ -95,7 +95,6 @@ function startSpinning() {
         lastRotation = targetRotation;
         timeLeft = WAIT_DURATION / 1000;
         gameState.state = 'WAITING';
-        
         saveResultToFile(winnerColor);
     }, SPIN_DURATION);
 }
@@ -137,7 +136,7 @@ app.post('/api/register', async (req, res) => {
 setubDb().then((database) => {
     db = database;
 
-    app.listen(3000, () => {
+    http.listen(3000, () => {
         console.log('Сервер: http://localhost:3000');
     });
 });

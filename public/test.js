@@ -105,9 +105,13 @@ function initWheel() {
             type = 'yellow';
             icon = iconRunner;
         } else {
-            type = currentType === 0 ? 'blue' : 'green';
-            icon = currentType === 0 ? iconWings : iconSwords;
-            currentType = 1 - currentType;
+            if (i % 2 === 1) {
+                type = 'blue';
+                icon = iconWings;
+            } else {
+                type = 'green';
+                icon = iconSwords;
+            }
         }
 
         item.classList.add(type);
@@ -132,7 +136,7 @@ function updateLogic(now) {
         if (progress >= 1) {
             progress = 1;
             state = 'WAITING';
-
+            arrow.classList.remove('visible');
             loadHistory();
         }
 
@@ -170,10 +174,8 @@ function updateLiftingEffect() {
 }
 
 function setWinnerColor(targetIndex) {
-    const item = items[targetIndex];
-    if (item.classList.contains('yellow'))winnerColor = 'yellow';
-    else if (item.classList.contains('blue')) winnerColor = 'blue';
-    else if (item.classList.contains('green')) winnerColor = 'green';
+    if (targetIndex % 10 === 0) winnerColor = 'yellow';
+    else winnerColor = (targetIndex % 2 === 1) ? 'blue' : 'green';
 }
 
 function easeOutQuart(x) {
