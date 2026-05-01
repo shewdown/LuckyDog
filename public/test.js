@@ -1,3 +1,5 @@
+const { getCurrentGame } = require("../database");
+
 let state = 'COUNTDOWN';
 let timeLeft = 0;
 let winnerColor = null;
@@ -194,10 +196,16 @@ async function loadHistory() {
     const historyContainer = document.getElementById('history-games-container');
     historyContainer.innerHTML = '';
 
+    if(state === 'COUNTDOWN'){
+        document.getElementById('total-bet-yellow').innerText = "0.00";
+        document.getElementById('total-bet-blue').innerText = "0.00";
+        document.getElementById('total-bet-green').innerText = "0.00";
+    }
+
     history.forEach(game => {
         const div = document.createElement('div');
         div.classList.add('history-game');
-        div.style.backgroundColor = `var(--${game.winnerColor})`;
+        div.style.backgroundColor = `var(--${game.winner_color})`;
         historyContainer.appendChild(div);
     });
 }
@@ -239,21 +247,34 @@ function updateBetInput(modifier) {
     input.value = Math.min(val, balance).toFixed(2);
 }
 
-function placeBet(color) {
+async function placeBet(color) {
     const input = document.getElementById('bet-value');
     const amount = Number(input.value);
-    const balance = Number(balicDisplay.innerText);
+    
+    const login = '1'; 
 
-    if (state === "COUNTDOWN" && amount > 0 && balance >= amount) {
-        balicDisplay.innerText = (balance - amount).toFixed(2);
-        
-        const existingBet = possibleWnnings.get(color) || 0;
-        possibleWnnings.set(color, existingBet + amount);
-        
-        const displayId = `total-bet-${color}`;
-        document.getElementById(displayId).innerText = (Number(document.getElementById(displayId).innerText) + amount).toFixed(2);
-        
-        input.value = 0;
+    try {
+        const response = await fetch('/api/bet', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ login, amount, color })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            balicDisplay.innerText = data.newBalance.toFixed(2);
+            
+            const displayId = `total-bet-${color}`;
+            const currentTotal = Number(document.getElementById(displayId).innerText);
+            document.getElementById(displayId).innerText = (currentTotal + amount).toFixed(2);
+            
+            console.log("Ставка принята!");
+        } else {
+            alert(data.error || "Ошибка при размещении ставки");
+        }
+    } catch (err) {
+        console.error("Ошибка сети:", err);
     }
 }
 
