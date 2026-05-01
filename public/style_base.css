@@ -37,6 +37,10 @@ h3 {
     font-weight: normal;
 }
 
+.title {
+    text-align: center;
+}
+
 main {
     margin-top: 60px;
     width: 100vw;

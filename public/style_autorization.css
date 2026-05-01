@@ -1,0 +1,89 @@
+/* ФОРМЫ ВХОДА И РЕГИСТРАЦИИ */
+
+.forms-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 100%;
+    height: 85vh;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: absolute;
+    width: 250px;
+    padding: 50px 15px;
+    gap: 10px;
+
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    
+    border-radius: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+
+    opacity: 0;
+    pointer-events: none;
+}
+
+form.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+form .title {
+    color: #f1f1f1;
+    font-size: 20px;
+    margin: -10px 0 15px 0;
+}
+
+form .text-link {
+    margin-top: 5px;
+
+    text-align: center;
+
+    color: #e1e1e1;
+    font-size: 14px;
+}
+
+form .text-link a {
+    text-align: center;
+
+    color: #e1e1e1;
+    font-size: 14px;
+
+    text-decoration: underline;
+}
+
+form input {
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    border-radius: 7.5px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+
+    color: #f1f1f1;
+    font-size: 16px;
+    padding: 5px 10px;
+    outline: none;
+}
+
+form input::placeholder {
+    color: #e1e1e1;
+}
+
+form button {
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+
+    border-radius: 7.5px;
+    padding: 5px 10px;
+
+    color: #f1f1f1;
+    font-size: 16px;
+}
