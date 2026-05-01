@@ -90,7 +90,7 @@ nav {
 .logo {
     color: #323232;
     font-weight: 800;
-    font-size: 18px;
+    font-size: 24px;
 }
 
 .balance {
@@ -192,7 +192,14 @@ footer .icons {
     gap: 5px;
 }
 
+footer .icons img {
+    width: 29px;
+    height: 29px;
+    object-fit: contain;
+}
+
 footer .copyright-block {
+    margin-top: 15px;
     display: flex;
     align-items: center;
     gap: 5px;
@@ -206,4 +213,21 @@ footer .copyright-block .age-badge {
     height: 30px;
     justify-content: center;
     align-items: center;
+}
+
+footer .adress {
+    margin-top: 15px;
+    width: 95%;
+}
+
+footer .user-agreement {
+    margin-top: 15px;
+    display: flex;
+    gap: 5px 20px;
+    flex-wrap: wrap;
+}
+
+footer .user-agreement a {
+    color: #f1f1f1;
+    font-weight: 600;
 }
