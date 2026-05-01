@@ -7,7 +7,8 @@ const io = require('socket.io')(http);
 const path = require('path');
 const { constants } = require('buffer');
 
-const {setubDb, registerUser, getUserByLogin, registerGame} = require('./database');
+const {setubDb, registerUser, getUserByLogin, registerGame, getGamesHistory, registerBet, getCurrentGame} = require('./database');
+const { error } = require('console');
 let db;
 
 const TOTAL_ITEMS = 40;
@@ -31,12 +32,27 @@ app.use(express.json());
 const FILE_PATH = './history.json';
 
 // 1. Получение истории (GET)
-app.get('/get-history', (req, res) => {
-    if (!fs.existsSync(FILE_PATH)) {
-        return res.json([]);
+app.get('/get-history', async (req, res) => {
+    const history = await getGamesHistory(db);
+    res.json(history);
+});
+
+app.post('/api/bet', async (req, res) => {
+    const { login, amount, color } = req.body;
+
+    if (state !== "COUNTDOWN") {
+        return res.status(400).json({ error: "Ставки закрыты, идет раунд!" });
     }
-    const data = fs.readFileSync(FILE_PATH);
-    res.json(JSON.parse(data));
+    if (amount <= 0) {
+        return res.status(400).json({ error: "Сумма должна быть больше 0" });
+    }
+
+    try {
+        const result = await registerBet(db, login, amount, color);
+        res.json({ success: true, newBalance: result.newBalance });
+    } catch (err) {
+        res.status(400).json({ success: false, error: err.message });
+    }
 });
 
 io.on('connection', (socket) => {
@@ -68,7 +84,7 @@ setInterval(() => {
     });
 }, 100);
 
-function startSpinning() {
+async function startSpinning() {
     state = 'SPINNING';
     
     winnerIndex = Math.floor(Math.random() * TOTAL_ITEMS);
@@ -90,11 +106,14 @@ function startSpinning() {
 
     io.emit('commandSpin', gameState);
 
-    setTimeout(() => {
+    setTimeout(async() => {
         state = 'WAITING';
         lastRotation = targetRotation;
         timeLeft = WAIT_DURATION / 1000;
         gameState.state = 'WAITING';
+
+        await registerGame(db, winnerColor, winnerIndex);
+        
         saveResultToFile(winnerColor);
     }, SPIN_DURATION);
 }
@@ -120,7 +139,6 @@ function saveResultToFile(color) {
     fs.writeFileSync(FILE_PATH, JSON.stringify(history, null, 2));
 }
 
-// База данных
 
 app.post('/api/register', async (req, res) => {
     try {
