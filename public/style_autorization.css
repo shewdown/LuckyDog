@@ -7,6 +7,9 @@
 
     width: 100%;
     height: 85vh;
+
+    overflow: hidden; 
+    position: relative;
 }
 
 form {
@@ -25,13 +28,24 @@ form {
     border: 2px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 5px 10px rgba(0,0,0,0.1);
 
-    opacity: 0;
     pointer-events: none;
+    transition: all 300ms ease;
 }
 
-form.active {
+form#formLogin {
+    opacity: 0;
+    transform: translate(-150%, 0);
+}
+
+form#formRegister {
+    opacity: 0;
+    transform: translate(150%, 0);
+}
+
+form#formLogin.active, form#formRegister.active {
     opacity: 1;
     pointer-events: auto;
+    transform: translate(0%, 0);
 }
 
 form .title {
