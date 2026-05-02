@@ -1,3 +1,91 @@
+#blocks-info-container {
+    justify-content: start;
+    align-items: center;
+    display: flex;
+    height: 60px;
+    gap: 10px;
+    align-items: center;
+    border-radius: 10px;
+
+    overflow-x: auto;
+    &::-webkit-scrollbar {display: none;}
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.bonuses {
+    display: flex;
+    height: 100%;
+    padding: 0 100px 0 15px;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    border-radius: 15px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    color: #f1f1f1;
+    font-weight: 600;
+    font-size: 18px;
+}
+
+#formPromo {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    height: 60px;
+    padding: 0 15px;
+
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    border-radius: 15px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+#formPromo .title {
+    color: #f1f1f1;
+    font-weight: 600;
+    font-size: 18px
+}
+
+#formPromo .input-with-button {
+    display: flex;
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    border-radius: 7.5px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    width: 200px;
+    padding: 2.5px;
+}
+
+#formPromo input {
+    width: 84%;
+    background-color: transparent;
+    border: none;
+    color: #f1f1f1;
+    font-weight: 600;
+    font-size: 16px;
+    padding: 5px 10px;
+    outline: none;
+}
+
+#formPromo input::placeholder {
+    color: #f1f1f1;
+}
+
+#formPromo button {
+    color: #f1f1f1;
+    font-weight: 600;
+    width: 16%;
+    padding: 5px;
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    border-radius: 7.5px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+}
+
+/* Режимы игр */
+
 .game-modes h1 {
     color: #f1f1f1;
     font-weight: 600;
@@ -29,7 +117,7 @@
     font-size: 16px;
     font-weight: 800;
 
-    background-color:rgb(255, 255, 255, 0.3);
+    background-color: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(5px);
 
     box-shadow: 0 5px 20px rgba(0,0,0,0.1);
