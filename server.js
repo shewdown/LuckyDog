@@ -14,7 +14,8 @@ const {
     getUserByLogin,
     registerGame,
     getGamesHistory,
-    registerBet
+    registerBet,
+    payoutWinners
 } = require('./database');
 
 // ───────────────────────────── Константы ─────────────────────────────
@@ -46,6 +47,26 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/get-history', async (req, res) => {
     const history = await getGamesHistory(db);
     res.json(history);
+});
+
+app.get('/api/balance/:login', async (req, res) => {
+    try {
+        const user = await getUserByLogin(db, req.params.login);
+        if (!user) return res.status(404).json({ error: 'Пользователь не найден' });
+        res.json({ balance: user.balance });
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+app.get('/api/bets/totals', async (req, res) => {
+    const totals = await db.all(`
+        SELECT chosen_color, SUM(amount) as total
+        FROM bets
+        WHERE game_id IS NULL
+        GROUP BY chosen_color
+    `);
+    res.json(totals);
 });
 
 app.post('/api/register', async (req, res) => {
@@ -89,6 +110,9 @@ app.post('/api/login', async (req, res) => {
 app.post('/api/bet', async (req, res) => {
     const { login, amount, color } = req.body;
 
+    if (!login)
+        return res.status(400).json({ error: "Необходима авторизация" });
+
     if (state !== 'COUNTDOWN')
         return res.status(400).json({ error: "Ставки закрыты, идёт раунд!" });
 
@@ -97,7 +121,26 @@ app.post('/api/bet', async (req, res) => {
 
     try {
         const result = await registerBet(db, login, amount, color);
+
+        const totals = await db.all(`
+            SELECT chosen_color, SUM(amount) as total
+            FROM bets WHERE game_id IS NULL
+            GROUP BY chosen_color
+        `);
+        io.emit('betTotals', totals);
+
         res.json({ success: true, newBalance: result.newBalance });
+    } catch (err) {
+        res.status(400).json({ success: false, error: err.message });
+    }
+});
+
+app.post('/api/payout', async (req, res) => {
+    const { winnerColor } = req.body;
+
+    try {
+        await payoutWinners(db, winnerColor);
+        res.json({ success: true });
     } catch (err) {
         res.status(400).json({ success: false, error: err.message });
     }
@@ -105,8 +148,15 @@ app.post('/api/bet', async (req, res) => {
 
 // ───────────────────────────── Socket.IO ─────────────────────────────
 
-io.on('connection', (socket) => {
+io.on('connection', async (socket) => {
     socket.emit('sync-game', gameState);
+
+    const totals = await db.all(`
+        SELECT chosen_color, SUM(amount) as total
+        FROM bets WHERE game_id IS NULL
+        GROUP BY chosen_color
+    `);
+    socket.emit('betTotals', totals);
 });
 
 // ───────────────────────────── Игровой цикл ─────────────────────────────
@@ -161,8 +211,10 @@ async function startSpinning() {
         lastRotation = targetRotation;
         gameState.state = 'WAITING';
 
-        await registerGame(db, winnerColor, winnerIndex);
-        saveResultToFile(winnerColor);
+        const gameId = await registerGame(db, winnerColor, winnerIndex);
+        await payoutWinners(db, winnerColor, gameId); 
+
+        io.emit('roundEnd', { winnerColor });
     }, SPIN_DURATION);
 }
 

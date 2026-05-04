@@ -1,10 +1,16 @@
 loadUserData();
-
 function loadUserData(){
     const balicDisplay = document.getElementById('balic');
     const user = JSON.parse(localStorage.getItem('user'))
 
-    balicDisplay.innerText = String(user.balance);
+    if(!!user){
+        balicDisplay.innerText = String(Number(user.balance).toFixed(2));        
+    }
+    else{
+        balicDisplay.innerText = '0';
+    }
+    console.log(user.balance);
+    
 }
 
 function toggleMenu() {
