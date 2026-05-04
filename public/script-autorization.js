@@ -41,8 +41,6 @@ async function handleAuth(){
 
         const data = await response.json();
 
-        console.log(data.balance);
-
         if (data.success) {
             localStorage.setItem('user', JSON.stringify({ login: data.login, balance: data.balance }));
             window.location.href = 'index.html';

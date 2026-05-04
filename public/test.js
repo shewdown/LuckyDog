@@ -67,15 +67,43 @@ socket.on('gameTick', (data) => {
     }
 
     if (state === 'WAITING') {
+        ['yellow', 'blue', 'green'].forEach(color => {
+        document.getElementById(`total-bet-${color}`).innerText = '0.00';
+        });
         timeDisplay.textContent  = '';
         labelDisplay.textContent = 'Поздравляем победителей!';
     }
+});
+
+socket.on('betTotals', (totals) => {
+    ['yellow', 'blue', 'green'].forEach(color => {
+        document.getElementById(`total-bet-${color}`).innerText = '0.00';
+    });
+
+    totals.forEach(({ chosen_color, total }) => {
+        const el = document.getElementById(`total-bet-${chosen_color}`);
+        if (el) el.innerText = Number(total).toFixed(2);
+    });
 });
 
 socket.on('commandSpin', (data) => {
     startSpinningFromServer(data.targetIndex, data.duration, 0);
     timeDisplay.textContent  = '';
     labelDisplay.textContent = 'Крутим...';
+});
+
+socket.on('roundEnd', async ({ winnerColor }) => {
+    const login = JSON.parse(localStorage.getItem('user'))?.login;
+    if (!login) return;
+
+    const response = await fetch(`/api/balance/${login}`);
+    const data     = await response.json();
+
+    balicDisplay.innerText = Number(data.balance).toFixed(2);
+
+    const user = JSON.parse(localStorage.getItem('user'));
+    user.balance = data.balance;
+    localStorage.setItem('user', JSON.stringify(user));
 });
 
 // ───────────────────────────── Колесо ─────────────────────────────
@@ -125,7 +153,7 @@ function updateLogic(now) {
 
         if (progress >= 1) {
             progress = 1;
-            state    = 'WAITING';
+            state = 'WAITING';
             arrow.classList.remove('visible');
             loadHistory();
         }
@@ -166,8 +194,11 @@ function updateLiftingEffect() {
 // ───────────────────────────── Ставки ─────────────────────────────
 
 async function placeBet(color) {
-    const amount = Number(document.getElementById('bet-value').value);
-    const login  = JSON.parse(localStorage.getItem('user'))?.login; // берём из localStorage
+    const input  = document.getElementById('bet-value');
+    const amount = Number(input.value);
+    const login  = JSON.parse(localStorage.getItem('user'))?.login;
+
+    if (amount <= 0) return alert("Введите сумму ставки");
 
     try {
         const response = await fetch('/api/bet', {
@@ -181,13 +212,17 @@ async function placeBet(color) {
         if (data.success) {
             balicDisplay.innerText = data.newBalance.toFixed(2);
 
-            const display = document.getElementById(`total-bet-${color}`);
-            display.innerText = (Number(display.innerText) + amount).toFixed(2);
+            const user = JSON.parse(localStorage.getItem('user'));
+            user.balance = data.newBalance;
+            localStorage.setItem('user', JSON.stringify(user));
+
+            input.value = '0.00';
         } else {
             alert(data.error || "Ошибка при размещении ставки");
         }
     } catch (err) {
         console.error("Ошибка сети:", err);
+        alert("Нет соединения с сервером");
     }
 }
 

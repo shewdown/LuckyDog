@@ -61,20 +61,14 @@ async function getUserByLogin(db, login) {
     }
 }
 
-async function updateUserBalance(db, login, balance) {
-    return db.run(
-        'UPDATE users SET balance = ? WHERE login = ?',
-        [balance, login]
-    );
-}
-
 // ───────────────────────────── Игры ─────────────────────────────
 
 async function registerGame(db, winner_color, winner_index) {
-    return db.run(
+    const result = await db.run(
         'INSERT INTO games (winner_color, winner_index) VALUES (?, ?)',
         [winner_color, winner_index]
     );
+    return result.lastID;
 }
 
 async function getGamesHistory(db) {
@@ -92,7 +86,7 @@ async function getCurrentGame(db) {
 async function registerBet(db, login, amount, chosen_color) {
     const user = await getUserByLogin(db, login);
 
-    if (!user)              throw new Error('Пользователь не найден');
+    if (!user) throw new Error('Пользователь не найден');
     if (user.balance < amount) throw new Error('Недостаточно средств');
 
     await db.run(
@@ -105,9 +99,38 @@ async function registerBet(db, login, amount, chosen_color) {
         [user.id, amount, chosen_color]
     );
 
-    return { betId: result.lastID, newBalance: user.balance - amount };
+    const updated = await getUserByLogin(db, login);
+
+    return { betId: result.lastID, newBalance: updated.balance };
 }
 
+async function payoutWinners(db, winnerColor, gameId) {
+    const multiplier = winnerColor === 'yellow' ? 14 : 2;
+
+    await db.run(
+        'UPDATE bets SET game_id = ? WHERE game_id IS NULL',
+        [gameId]
+    );
+
+    const winners = await db.all(
+        'SELECT * FROM bets WHERE game_id = ? AND chosen_color = ?',
+        [gameId, winnerColor]
+    );
+
+    for (const bet of winners) {
+        const winAmount = bet.amount * multiplier;
+
+        await db.run(
+            'UPDATE users SET balance = balance + ? WHERE id = ?',
+            [winAmount, bet.user_id]
+        );
+
+        await db.run(
+            'UPDATE bets SET win_amount = ? WHERE id = ?',
+            [winAmount, bet.id]
+        );
+    }
+}
 // ───────────────────────────── Экспорт ─────────────────────────────
 
 module.exports = {
@@ -117,5 +140,6 @@ module.exports = {
     registerGame,
     getGamesHistory,
     registerBet,
-    getCurrentGame
+    getCurrentGame,
+    payoutWinners
 };
