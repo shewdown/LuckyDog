@@ -42,9 +42,9 @@
         <div class="forms-container">
             <form id="formLogin" class="active">
                 <div class="title">Вход</div>
-                <input type="login" placeholder="Логин" required>
-                <input type="password" placeholder="Пароль" required>
-                <button type="submit">Войти</button>
+                <input type="login" placeholder="Логин" id="auth-login" required>
+                <input type="password" placeholder="Пароль" id="auth-pass" required>
+                <button type="button" onclick="handleAuth()">Войти</button>
                 <div class="text-link">
                     Нет аккаунта? <a onclick="toggleForm()">Регистрация</a>
                 </div>
@@ -52,10 +52,10 @@
         
             <form id="formRegister" class="">
                 <div class="title">Регистрация</div>
-                <input type="Имя" placeholder="Имя" required>
-                <input type="login" placeholder="Логин *" required>
-                <input type="password" placeholder="Пароль *" required>
-                <button type="submit">Войти</button>
+                <input type="Имя" placeholder="Имя">
+                <input type="login" placeholder="Логин *" id="reg-login" required>
+                <input type="password" placeholder="Пароль *" id="reg-pass" required>
+                <button type="button" onclick="handleRegister()">Зарегистрироваться</button>
                 <div class="text-link">
                     Есть аккаунт? <a onclick="toggleForm()">Вход</a>
                 </div>
