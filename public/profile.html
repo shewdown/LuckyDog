@@ -5,17 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LuckyDog | Главная</title>
     <link rel="stylesheet" href="style_base.css">
-    <link rel="stylesheet" href="style_autorization.css">
+    <link rel="stylesheet" href="style_profile.css">
 </head>
 <body>
     <header>
         <nav>
             <div class="logo" onclick="window.location.href='index.html'">LuckyDog</div>
 
-
             <div class="balance" id="balic">0.00</div>
 
-            <div class="profile"></div>
+            <div class="profile" onclick="window.location.href='autorization.html'"></div>
 
             <button class="burger" onclick="toggleMenu()">
                 <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px" fill="#000000"><path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z"/></svg>
@@ -39,31 +38,28 @@
             <a href="#">Профиль</a>
         </div>
 
-        <div class="forms-container">
-            <form id="formLogin" class="active">
-                <div class="title">Вход</div>
-                <input type="login" placeholder="Логин" id="auth-login" required>
-                <input type="password" placeholder="Пароль" id="auth-pass" required>
-                <button type="button" onclick="handleAuth()">Войти</button>
-                <div class="text-link">
-                    Нет аккаунта? <a onclick="toggleForm()">Регистрация</a>
+        <div class="container-glass">
+            <div class="title-page">Профиль</div>
+
+            <div class="container-info">
+                <div class="avatar">
+                    <img src="icons/test-avatar.png" alt="avatar">
                 </div>
-            </form>
-        
-            <form id="formRegister" class="">
-                <div class="title">Регистрация</div>
-                <input type="Имя" placeholder="Имя">
-                <input type="login" placeholder="Логин *" id="reg-login" required>
-                <input type="password" placeholder="Пароль *" id="reg-pass" required>
-                <button type="button" onclick="handleRegister()">Зарегистрироваться</button>
-                <div class="text-link">
-                    Есть аккаунт? <a onclick="toggleForm()">Вход</a>
-                </div>
-            </form>
+
+                <div class="title-info">Имя</div>
+                <div class="name">Кирилл</div>
+
+                <div class="title-info">Логин</div>
+                <div class="login">#shewdown</div>
+
+                <div class="title-info">Регистрация</div>
+                <div class="date-registration">04.05.2026</div>
+            </div>
         </div>
     </main>
 
+    <footer></footer>
+
     <script src="script.js"></script>
-    <script src="script-autorization.js"></script>
 </body>
 </html>
